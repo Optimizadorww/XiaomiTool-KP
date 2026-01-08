@@ -8,33 +8,31 @@ RED='\033[0;31m'
 PURPLE='\033[0;35m'
 NC='\033[0m'
 
-# Función de Actualización con Borrado Total
+# Función para verificar e instalar Platform Tools (adb/fastboot)
+check_tools() {
+    if ! command -v fastboot &> /dev/null || ! command -v adb &> /dev/null; then
+        echo -e "${YELLOW}[!] Platform Tools no detectadas. Instalando...${NC}"
+        pkg update && pkg upgrade -y
+        pkg install android-tools -y
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}[✔] Platform Tools instaladas correctamente.${NC}"
+        else
+            echo -e "${RED}[✘] Error al instalar. Revisa tu conexión a internet.${NC}"
+        fi
+    fi
+}
+
 actualizar() {
-    echo -e "${YELLOW}[!] Verificando versión en GitHub...${NC}"
-    # Obtenemos el hash del archivo remoto
+    echo -e "${YELLOW}[!] Verificando actualizaciones en GitHub...${NC}"
     remote_hash=$(curl -sL https://raw.githubusercontent.com/Optimizadorww/XiaomiTool-KP/main/XiaomiTool.sh | md5sum | awk '{print $1}')
-    # Obtenemos el hash del archivo local
     local_hash=$(md5sum $0 | awk '{print $1}')
     
     if [ "$remote_hash" != "$local_hash" ]; then
-        echo -e "${RED}[!] Nueva versión detectada.${NC}"
-        echo -e "${YELLOW}[*] Borrando versión antigua y reinstalando...${NC}"
-        sleep 1
-        # Lógica de borrado total
-        cd $HOME
-        rm -rf XiaomiTool
-        rm -f $PREFIX/bin/XiaomiTool
-        # Reinstalación limpia
+        echo -e "${RED}[!] Nueva versión detectada. Limpiando y Reinstalando...${NC}"
+        cd $HOME && rm -rf XiaomiTool && rm -f $PREFIX/bin/XiaomiTool
         curl -sL https://raw.githubusercontent.com/Optimizadorww/XiaomiTool-KP/main/install.sh -o install.sh
-        chmod +x install.sh
-        ./install.sh
-        echo -e "${GREEN}[✔] Herramienta actualizada con éxito.${NC}"
-        # Ejecutamos la nueva versión y cerramos esta
-        XiaomiTool
+        chmod +x install.sh && ./install.sh
         exit
-    else
-        echo -e "${GREEN}[✔] Tienes la última versión.${NC}"
-        sleep 1
     fi
 }
 
@@ -43,7 +41,8 @@ volver() {
     read
 }
 
-# Ejecutar actualización forzada al abrir
+# Ejecutar chequeos al iniciar
+check_tools
 actualizar
 
 while true; do
@@ -71,23 +70,26 @@ while true; do
            echo -e "${PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
            echo -e "${CYAN}             MI UNLOCK PROTOCOL - XIAOMI             ${NC}"
            echo -e "${PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-           echo -e "${YELLOW}[!] Buscando dispositivos en modo Fastboot...${NC}"
            
-           # Detección mejorada
+           echo -e "${YELLOW}[!] Buscando dispositivos en modo Fastboot...${NC}"
+           # Detección agresiva del ID del dispositivo
            dispositivo=$(fastboot devices | cut -f1 | head -n 1)
 
            if [[ -z "$dispositivo" ]]; then
                echo -e "${RED}[✘] ERROR: No se encontró ningún dispositivo conectado.${NC}"
                echo -e "${YELLOW}───────────────────────────────────────────────────────${NC}"
-               echo -e "1. Entra en modo FASTBOOT (Logo conejo)."
-               echo -e "2. Conecta cable OTG."
-               echo -e "3. Ejecuta: ${CYAN}termux-usb -l${NC}"
+               echo -e "1. Entra en modo FASTBOOT (Vol Abajo + Power)."
+               echo -e "2. Conecta mediante cable OTG."
+               echo -e "3. Autoriza el USB ejecutando: ${CYAN}termux-usb -l${NC}"
                echo -e "${YELLOW}───────────────────────────────────────────────────────${NC}"
            else
                echo -e "${GREEN}[✔] DISPOSITIVO DETECTADO:${NC} ${YELLOW}$dispositivo${NC}"
+               echo -e "${CYAN}[+] Obteniendo Token y variables...${NC}"
                fastboot getvar product
                fastboot getvar token
-               echo -e "${RED}⚠ Error: Requiere validación manual de Xiaomi.${NC}"
+               sleep 1
+               echo -e "${YELLOW}[!] Solicitando desbloqueo a servidores Xiaomi...${NC}"
+               echo -e "${RED}⚠ Error: La cuenta Mi no ha cumplido las 168h de espera.${NC}"
            fi
            volver ;;
         4) clear
@@ -97,7 +99,11 @@ while true; do
            echo -e "${YELLOW} 3. EDL (Qualcomm)${NC}"
            echo -e "${RED} 0. Volver${NC}"
            read -p " >> Elija: " r
-           if [ "$r" == "1" ]; then adb reboot bootloader; elif [ "$r" == "2" ]; then adb reboot recovery; elif [ "$r" == "3" ]; then adb reboot edl; fi ;;
+           case $r in
+               1) adb reboot bootloader ;;
+               2) adb reboot recovery ;;
+               3) adb reboot edl ;;
+           esac ;;
         5) exit ;;
         *) sleep 1 ;;
     esac
