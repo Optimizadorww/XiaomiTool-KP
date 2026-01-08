@@ -1,19 +1,20 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-echo -e "\e[32mInstalando XiaomiTool-KP de @AntiKripis...\e[0m"
+echo -e "\e[32mIniciando instalación de XiaomiTool-KP...\e[0m"
 
-# Instalar dependencias necesarias
-pkg update && pkg upgrade -y
-pkg install android-tools curl python -y
+# Crear carpeta y entrar (CD)
+mkdir -p $HOME/XiaomiTool-KP
+cd $HOME/XiaomiTool-KP
 
-# Descargar el script principal y meterlo en el sistema
-# NOTA: Cambia 'TU_USER' por tu nombre real de GitHub abajo
-curl -sL https://raw.githubusercontent.com/TU_USER/XiaomiTool-KP/main/XiaomiTool.sh -o $PREFIX/bin/XiaomiTool-KP
+# Descargar el script usando CURL
+# REEMPLAZA "TU_USER" con tu usuario de GitHub
+curl -sL https://raw.githubusercontent.com/TU_USER/XiaomiTool-KP/main/XiaomiTool.sh -o XiaomiTool-KP
 
-# DAR TODOS LOS PERMISOS (Lectura, Escritura, Ejecución)
-chmod 777 $PREFIX/bin/XiaomiTool-KP
+# Dar todos los permisos
+chmod 777 XiaomiTool-KP
 
-echo -e "\e[36m--------------------------------------------------\e[0m"
-echo -e "\e[32m¡INSTALACIÓN COMPLETADA CON ÉXITO!\e[0m"
-echo -e "Ya puedes usar la herramienta escribiendo: \e[33mXiaomiTool-KP\e[0m"
-echo -e "\e[36m--------------------------------------------------\e[0m"
+# Hacerlo comando global
+cp XiaomiTool-KP $PREFIX/bin/
+chmod +x $PREFIX/bin/XiaomiTool-KP
+
+echo -e "\e[32mInstalación terminada. Escribe 'XiaomiTool-KP' para iniciar.\e[0m"
