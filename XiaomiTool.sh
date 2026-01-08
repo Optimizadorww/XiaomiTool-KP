@@ -8,11 +8,38 @@ RED='\033[0;31m'
 PURPLE='\033[0;35m'
 NC='\033[0m'
 
+# Instalación automática de dependencias si no existen
 instalar_herramientas() {
     if ! command -v fastboot &> /dev/null || ! command -v adb &> /dev/null; then
-        echo -e "${YELLOW}[!] Instalando Platform Tools...${NC}"
+        echo -e "${YELLOW}[!] Plataform Tools no detectadas. Instalando...${NC}"
         pkg update && pkg upgrade -y
         pkg install android-tools curl -y
+    fi
+}
+
+# Función que borra la versión vieja e instala la nueva de GitHub
+actualizar() {
+    echo -e "${YELLOW}[!] Verificando actualizaciones en GitHub...${NC}"
+    # Intentamos obtener el hash del archivo remoto
+    REMOTE_URL="https://raw.githubusercontent.com/Optimizadorww/XiaomiTool-KP/main/XiaomiTool.sh"
+    REMOTE_HASH=$(curl -sL "$REMOTE_URL" | md5sum | awk '{print $1}')
+    LOCAL_HASH=$(md5sum "$0" | awk '{print $1}')
+
+    if [ "$REMOTE_HASH" != "$LOCAL_HASH" ] && [ ! -z "$REMOTE_HASH" ]; then
+        echo -e "${RED}[!] Nueva versión encontrada. Borrando versión actual...${NC}"
+        sleep 1
+        # Proceso de eliminación y reinstalación limpia
+        cd $HOME
+        rm -rf XiaomiTool
+        rm -f $PREFIX/bin/XiaomiTool
+        curl -sL https://raw.githubusercontent.com/Optimizadorww/XiaomiTool-KP/main/install.sh -o install.sh
+        chmod +x install.sh
+        ./install.sh
+        echo -e "${GREEN}[✔] Reinstalación completada. Por favor, escribe XiaomiTool.${NC}"
+        exit
+    else
+        echo -e "${GREEN}[✔] Estás usando la versión más reciente.${NC}"
+        sleep 1
     fi
 }
 
@@ -21,7 +48,9 @@ volver() {
     read
 }
 
+# Ejecutar chequeos al iniciar
 instalar_herramientas
+actualizar
 
 while true; do
     clear
@@ -53,7 +82,7 @@ while true; do
                echo -e "${GREEN}[✔] Dispositivo detectado.${NC}"
                adb shell pm uninstall -k --user 0 com.miui.analytics
                adb shell pm uninstall -k --user 0 com.miui.msa.global
-               echo -e "${GREEN}[✔] Hecho.${NC}"
+               echo -e "${GREEN}[✔] Debloat finalizado.${NC}"
            fi
            volver ;;
         2) clear
@@ -81,7 +110,7 @@ while true; do
            fi
            volver ;;
         4) clear
-           echo -e "${YELLOW}" # Cambiado a Amarillo
+           echo -e "${YELLOW}"
            echo "--- OPCIONES DE REINICIO ---"
            echo " 1. Fastboot"
            echo " 2. Recovery"
