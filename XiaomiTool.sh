@@ -9,31 +9,40 @@ PURPLE='\033[0;35m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-# Instalación automática de dependencias
+# Función para asegurar que las herramientas siempre estén presentes
 instalar_herramientas() {
     if ! command -v fastboot &> /dev/null || ! command -v adb &> /dev/null; then
-        echo -e "${YELLOW}[!] Instalando Platform Tools...${NC}"
+        echo -e "${YELLOW}[!] Plataform Tools no detectadas. Instalando...${NC}"
         pkg update && pkg upgrade -y
         pkg install android-tools curl -y
     fi
 }
 
-# Auto-reinstalación desde GitHub
+# Lógica de Auto-Actualización desde GitHub
 actualizar() {
-    echo -e "${YELLOW}[!] Verificando actualizaciones en GitHub...${NC}"
+    echo -e "${YELLOW}[!] Verificando versión en GitHub...${NC}"
+    # URL del script original
     REMOTE_URL="https://raw.githubusercontent.com/Optimizadorww/XiaomiTool-KP/main/XiaomiTool.sh"
+    
+    # Obtener el hash remoto y compararlo con el local
     REMOTE_HASH=$(curl -sL "$REMOTE_URL" | md5sum | awk '{print $1}')
     LOCAL_HASH=$(md5sum "$0" | awk '{print $1}')
 
     if [ "$REMOTE_HASH" != "$LOCAL_HASH" ] && [ ! -z "$REMOTE_HASH" ]; then
-        echo -e "${RED}[!] Nueva versión detectada. Reinstalando...${NC}"
+        echo -e "${RED}[!] Nueva actualización detectada. Reinstalando sistema...${NC}"
+        sleep 1
         cd $HOME
+        # Borrado total para evitar conflictos
         rm -rf XiaomiTool
         rm -f $PREFIX/bin/XiaomiTool
+        # Descarga e inicia el instalador de nuevo
         curl -sL https://raw.githubusercontent.com/Optimizadorww/XiaomiTool-KP/main/install.sh -o install.sh
         chmod +x install.sh
         ./install.sh
         exit
+    else
+        echo -e "${GREEN}[✔] Versión v3.9 al día.${NC}"
+        sleep 1
     fi
 }
 
@@ -42,6 +51,7 @@ volver() {
     read
 }
 
+# Chequeos iniciales obligatorios
 instalar_herramientas
 actualizar
 
@@ -53,8 +63,8 @@ while true; do
     echo "   \  / | |/ _' |/ _ \| '_ ' _ \| | __/ _ \ / _ \| |"
     echo "   /  \ | | (_| | (_) | | | | | | | |_ (_) | (_) | |"
     echo "  /_/\_\|_|\__,_|\___/|_| |_| |_|_|\__\___/ \___/|_|"
-    # CAMBIO AQUÍ: Eliminada palabra Tool repetida por versión v3.0
-    echo -e "                ${CYAN}v 3 . 0${NC}"
+    # Versión v3.9 en AZUL como pediste
+    echo -e "                ${BLUE}v 3 . 9${NC}"
     echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${YELLOW} Creado por: ${GREEN}@AntiKripis${NC}"
     echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -68,10 +78,10 @@ while true; do
 
     case $opt in
         1) clear
-           echo -e "${YELLOW}[!] Verificando conexión ADB...${NC}"
+           echo -e "${YELLOW}[!] Iniciando ADB...${NC}"
            adb start-server > /dev/null 2>&1
            if [[ $(adb devices | wc -l) -lt 3 ]]; then
-               echo -e "${RED}[✘] ERROR: No hay dispositivos conectados.${NC}"
+               echo -e "${RED}[✘] ERROR: Conecta el móvil por ADB.${NC}"
            else
                adb shell pm uninstall -k --user 0 com.miui.analytics
                adb shell pm uninstall -k --user 0 com.miui.msa.global
@@ -81,7 +91,7 @@ while true; do
         2) clear
            fb_dev=$(fastboot devices | awk '{print $1}' | head -n 1)
            if [ -z "$fb_dev" ]; then
-               echo -e "${RED}[✘] ERROR: Conecta el móvil en Fastboot.${NC}"
+               echo -e "${RED}[✘] ERROR: No detectado en Fastboot.${NC}"
            else
                fastboot erase config
                fastboot erase frp
@@ -91,15 +101,15 @@ while true; do
         3) clear
            dispositivo=$(fastboot devices | awk '{print $1}' | head -n 1)
            if [ -z "$dispositivo" ]; then
-               echo -e "${RED}[✘] ERROR: No se encontró dispositivo conectado.${NC}"
-               echo -e "1. Entra en modo FASTBOOT ${RED}(logo Fastboot)${NC}."
+               echo -e "${RED}[✘] ERROR: Dispositivo no encontrado.${NC}"
+               echo -e "1. Entra en FASTBOOT ${RED}(logo Fastboot)${NC}."
            else
                fastboot getvar product; fastboot getvar token
-               echo -e "${RED}⚠ Error: El servidor requiere 168h de espera.${NC}"
+               echo -e "${RED}⚠ Error: Espera de 168h requerida.${NC}"
            fi
            volver ;;
         4) clear
-           # CAMBIO AQUÍ: Título en AZUL, opciones en AMARILLO
+           # Submenú con colores: Azul para títulos, Amarillo para opciones
            echo -e "${BLUE}--- OPCIONES DE REINICIO ---${NC}"
            echo -e "${YELLOW}1. Fastboot"
            echo "2. Recovery"
