@@ -66,4 +66,9 @@ while true; do
            echo -e "${YELLOW} 3. EDL (Qualcomm)${NC}"
            echo -e "${RED} 0. Volver${NC}"
            echo -e "${PURPLE}----------------------------${NC}"
-           read -p
+           read -p " >> Elija: " r
+           if [ "$r" == "1" ]; then adb reboot bootloader; elif [ "$r" == "2" ]; then adb reboot recovery; elif [ "$r" == "3" ]; then adb reboot edl; fi ;;
+        5) echo -e "${CYAN}¡Adiós @AntiKripis!${NC}"; exit ;;
+        *) echo -e "${RED}Error.${NC}"; sleep 1 ;;
+    esac
+done
