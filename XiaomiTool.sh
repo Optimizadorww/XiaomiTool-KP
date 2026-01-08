@@ -8,18 +8,16 @@ RED='\033[0;31m'
 PURPLE='\033[0;35m'
 NC='\033[0m'
 
-# Función interna para instalar herramientas de Android automáticamente
-instalar_dependencias() {
-    if ! command -v fastboot &> /dev/null || ! command -v adb &> /dev/null; then
-        echo -e "${YELLOW}[!] Platform Tools no detectadas. Instalando...${NC}"
+# Función para instalar Fastboot y ADB automáticamente si no existen
+instalar_herramientas() {
+    if ! command -v fastboot &> /dev/null; then
+        echo -e "${YELLOW}[!] Fastboot no encontrado. Instalando Platform Tools...${NC}"
         pkg update && pkg upgrade -y
         pkg install android-tools curl -y
-        echo -e "${GREEN}[✔] Herramientas instaladas correctamente.${NC}"
-        sleep 2
     fi
 }
 
-# Función de Auto-Actualización con limpieza
+# Función de actualización obligatoria
 actualizar() {
     echo -e "${YELLOW}[!] Verificando actualizaciones...${NC}"
     if curl -s -m 5 https://google.com > /dev/null; then
@@ -41,8 +39,8 @@ volver() {
     read
 }
 
-# La herramienta se encarga de todo al iniciar
-instalar_dependencias
+# Ejecutar procesos internos
+instalar_herramientas
 actualizar
 
 while true; do
