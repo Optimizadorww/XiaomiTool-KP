@@ -8,103 +8,19 @@ RED='\033[0;31m'
 PURPLE='\033[0;35m'
 NC='\033[0m'
 
-# Función para verificar e instalar Platform Tools (adb/fastboot)
 check_tools() {
     if ! command -v fastboot &> /dev/null || ! command -v adb &> /dev/null; then
         echo -e "${YELLOW}[!] Platform Tools no detectadas. Instalando...${NC}"
         pkg update && pkg upgrade -y
         pkg install android-tools -y
-        if [ $? -eq 0 ]; then
-            echo -e "${GREEN}[✔] Platform Tools instaladas correctamente.${NC}"
-        else
-            echo -e "${RED}[✘] Error al instalar. Revisa tu conexión a internet.${NC}"
-        fi
     fi
 }
 
 actualizar() {
-    echo -e "${YELLOW}[!] Verificando actualizaciones en GitHub...${NC}"
+    echo -e "${YELLOW}[!] Verificando actualizaciones...${NC}"
     remote_hash=$(curl -sL https://raw.githubusercontent.com/Optimizadorww/XiaomiTool-KP/main/XiaomiTool.sh | md5sum | awk '{print $1}')
     local_hash=$(md5sum $0 | awk '{print $1}')
     
     if [ "$remote_hash" != "$local_hash" ]; then
-        echo -e "${RED}[!] Nueva versión detectada. Limpiando y Reinstalando...${NC}"
+        echo -e "${RED}[!] Nueva versión detectada. Reinstalando...${NC}"
         cd $HOME && rm -rf XiaomiTool && rm -f $PREFIX/bin/XiaomiTool
-        curl -sL https://raw.githubusercontent.com/Optimizadorww/XiaomiTool-KP/main/install.sh -o install.sh
-        chmod +x install.sh && ./install.sh
-        exit
-    fi
-}
-
-volver() {
-    echo -e "\n${YELLOW}➡ Pulsa Enter para volver...${NC}"
-    read
-}
-
-# Ejecutar chequeos al iniciar
-check_tools
-actualizar
-
-while true; do
-    clear
-    echo -e "${PURPLE}"
-    echo "  __  __ _                          _            _ "
-    echo "  \ \/ /(_) __ _  ___  _ __ ___ (_) |_ ___   ___ | |"
-    echo "   \  / | |/ _' |/ _ \| '_ ' _ \| | __/ _ \ / _ \| |"
-    echo "   /  \ | | (_| | (_) | | | | | | | |_ (_) | (_) | |"
-    echo "  /_/\_\|_|\__,_|\___/|_| |_| |_|_|\__\___/ \___/|_|"
-    echo -e "                ${CYAN}T  O  O  L${NC}"
-    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${YELLOW} Creado por: ${GREEN}@AntiKripis${NC}"
-    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${GREEN} 1.${NC} Debloat Automático"
-    echo -e "${GREEN} 2.${NC} Modo Anti-Lag"
-    echo -e "${GREEN} 3.${NC} Mi Unlock (Desbloquear Bootloader)"
-    echo -e "${GREEN} 4.${NC} Reinicios (Submenú)"
-    echo -e "${RED} 5. Salir${NC}"
-    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    read -p " >> Selecciona una opción: " opt
-
-    case $opt in
-        3) clear
-           echo -e "${PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-           echo -e "${CYAN}             MI UNLOCK PROTOCOL - XIAOMI             ${NC}"
-           echo -e "${PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-           
-           echo -e "${YELLOW}[!] Buscando dispositivos en modo Fastboot...${NC}"
-           # Detección agresiva del ID del dispositivo
-           dispositivo=$(fastboot devices | cut -f1 | head -n 1)
-
-           if [[ -z "$dispositivo" ]]; then
-               echo -e "${RED}[✘] ERROR: No se encontró ningún dispositivo conectado.${NC}"
-               echo -e "${YELLOW}───────────────────────────────────────────────────────${NC}"
-               echo -e "1. Entra en modo FASTBOOT (Vol Abajo + Power)."
-               echo -e "2. Conecta mediante cable OTG."
-               echo -e "3. Autoriza el USB ejecutando: ${CYAN}termux-usb -l${NC}"
-               echo -e "${YELLOW}───────────────────────────────────────────────────────${NC}"
-           else
-               echo -e "${GREEN}[✔] DISPOSITIVO DETECTADO:${NC} ${YELLOW}$dispositivo${NC}"
-               echo -e "${CYAN}[+] Obteniendo Token y variables...${NC}"
-               fastboot getvar product
-               fastboot getvar token
-               sleep 1
-               echo -e "${YELLOW}[!] Solicitando desbloqueo a servidores Xiaomi...${NC}"
-               echo -e "${RED}⚠ Error: La cuenta Mi no ha cumplido las 168h de espera.${NC}"
-           fi
-           volver ;;
-        4) clear
-           echo -e "${PURPLE}--- OPCIONES DE REINICIO ---${NC}"
-           echo -e "${YELLOW} 1. Fastboot${NC}"
-           echo -e "${YELLOW} 2. Recovery${NC}"
-           echo -e "${YELLOW} 3. EDL (Qualcomm)${NC}"
-           echo -e "${RED} 0. Volver${NC}"
-           read -p " >> Elija: " r
-           case $r in
-               1) adb reboot bootloader ;;
-               2) adb reboot recovery ;;
-               3) adb reboot edl ;;
-           esac ;;
-        5) exit ;;
-        *) sleep 1 ;;
-    esac
-done
