@@ -1,5 +1,5 @@
 # 📱 XiaomiTool v3.9
-**Creado por: @AntiKripis**
+**Creado por: [![@AntiKripis](https://img.shields.io/badge/@AntiKripis-2ea44f?style=flat-square&logo=telegram&logoColor=white)](https://t.me/AntiKripis)**
 
 Una herramienta potente y automatizada para dispositivos Xiaomi basada en Termux. Diseñada para facilitar procesos de optimización, desbloqueo y recuperación sin complicaciones.
 
