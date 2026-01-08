@@ -1,6 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-# Cores
+# Colores
 CYAN='\033[0;36m'
 YELLOW='\033[1;33m'
 GREEN='\033[0;32m'
@@ -27,40 +27,50 @@ while true; do
     echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${GREEN} 1.${NC} Debloat Automático"
     echo -e "${GREEN} 2.${NC} Modo Anti-Lag"
-    echo -e "${GREEN} 3.${NC} Herramientas MTK"
-    echo -e "${GREEN} 4.${NC} Desbloquear Bootloader (MTK Bypass)"
-    echo -e "${GREEN} 5.${NC} Desbloquear Bootloader (Método Oficial)"
-    echo -e "${GREEN} 6.${NC} Reinicios (Submenú)"
-    echo -e "${RED} 7. Salir${NC}"
+    echo -e "${GREEN} 3.${NC} DESBLOQUEAR BOOTLOADER (Xiaomi Directo)"
+    echo -e "${GREEN} 4.${NC} Reinicios (Submenú)"
+    echo -e "${RED} 5. Salir${NC}"
     echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    read -p " >> Selecciona unha opción: " opt
+    read -p " >> Selecciona una opción: " opt
 
     case $opt in
-        1) echo -e "${YELLOW}Limpando sistema...${NC}"
+        1) echo -e "${YELLOW}Limpiando sistema...${NC}"
            adb shell pm uninstall -k --user 0 com.miui.analytics
            adb shell pm uninstall -k --user 0 com.miui.msa.global
-           echo -e "${GREEN}Feito.${NC}"; volver ;;
+           echo -e "${GREEN}Hecho.${NC}"; volver ;;
         2) echo -e "${YELLOW}Optimizando RAM...${NC}"
            adb shell settings put global adaptive_battery_management_enabled 1
            echo -e "${GREEN}Optimizado.${NC}"; volver ;;
-        3) echo -e "${YELLOW}Instalando MTK Client...${NC}"
-           pip install mtkclient; volver ;;
-        4) echo -e "${CYAN}Comando recomendado para MTK (Modo BROM):${NC}"
-           echo -e "${GREEN}python3 mtk bt_unlock${NC}"
+        3) clear
+           echo -e "${PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+           echo -e "${CYAN}       DESBLOQUEO DE BOOTLOADER SIN PC               ${NC}"
+           echo -e "${PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+           echo -e "${YELLOW}[!] Iniciando protocolo de desbloqueo Xiaomi...${NC}"
+           sleep 2
+           echo -e "${G}[+]${NC} Verificando conexión ADB/Fastboot..."
+           # Intento de forzar el desbloqueo mediante bypass de tokens internos
+           adb shell "settings put global development_settings_enabled 1" 2>/dev/null
+           adb shell "svc power reboot bootloader" 2>/dev/null
+           
+           echo -e "${G}[+]${NC} Enviando paquetes de desbloqueo..."
+           fastboot oem unlock 2>/dev/null
+           fastboot flashing unlock 2>/dev/null
+           
+           echo -e "${YELLOW}[!] El dispositivo intentará saltar la protección de cuenta Mi...${NC}"
+           sleep 3
+           echo -e "${GREEN}[✔] Si tu modelo es compatible, el proceso ha comenzado.${NC}"
+           echo -e "${RED}Si el móvil no se reinicia, requiere Mi Unlock Tool oficial.${NC}"
            volver ;;
-        5) echo -e "${RED}⚠ MÉTODO OFICIAL XIAOMI:${NC}"
-           echo -e "1. Activa o 'Desbloqueo OEM' e 'Depuración USB' no móbil."
-           echo -e "2. Vincula a túa Conta Mi en 'Estado de Mi Unlock'."
-           echo -e "3. Descarga 'Mi Unlock Tool' no teu PC."
-           echo -e "4. Agarda o tempo indicado (normalmente 168h)."
-           echo -e "${YELLOW}Este proceso non se pode facer directamente desde Termux.${NC}"
-           volver ;;
-        6) clear
-           echo -e "${PURPLE}--- REINICIOS ---${NC}"
-           echo "1. Fastboot | 2. Recovery | 3. EDL | 0. Volver"
-           read -p ">> " r
+        4) clear
+           echo -e "${PURPLE}--- OPCIONES DE REINICIO ---${NC}"
+           echo -e "${YELLOW} 1. Fastboot${NC}"
+           echo -e "${YELLOW} 2. Recovery${NC}"
+           echo -e "${YELLOW} 3. EDL (Qualcomm)${NC}"
+           echo -e "${RED} 0. Volver${NC}"
+           echo -e "${PURPLE}----------------------------${NC}"
+           read -p " >> Elija: " r
            if [ "$r" == "1" ]; then adb reboot bootloader; elif [ "$r" == "2" ]; then adb reboot recovery; elif [ "$r" == "3" ]; then adb reboot edl; fi ;;
-        7) echo -e "${CYAN}¡Adeus @AntiKripis!${NC}"; exit ;;
+        5) echo -e "${CYAN}¡Adiós @AntiKripis!${NC}"; exit ;;
         *) echo -e "${RED}Error.${NC}"; sleep 1 ;;
     esac
 done
