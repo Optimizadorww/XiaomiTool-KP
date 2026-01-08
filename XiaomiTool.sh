@@ -8,19 +8,20 @@ RED='\033[0;31m'
 PURPLE='\033[0;35m'
 NC='\033[0m'
 
-# Función para verificar e instalar dependencias
-check_deps() {
-    if ! command -v fastboot &> /dev/null; then
-        echo -e "${YELLOW}[!] Instalando Platform Tools...${NC}"
+# Función interna para instalar herramientas de Android automáticamente
+instalar_dependencias() {
+    if ! command -v fastboot &> /dev/null || ! command -v adb &> /dev/null; then
+        echo -e "${YELLOW}[!] Platform Tools no detectadas. Instalando...${NC}"
         pkg update && pkg upgrade -y
         pkg install android-tools curl -y
+        echo -e "${GREEN}[✔] Herramientas instaladas correctamente.${NC}"
+        sleep 2
     fi
 }
 
-# Función de Auto-Actualización con limpieza total
+# Función de Auto-Actualización con limpieza
 actualizar() {
     echo -e "${YELLOW}[!] Verificando actualizaciones...${NC}"
-    # Validamos si hay internet antes de descargar
     if curl -s -m 5 https://google.com > /dev/null; then
         remote_hash=$(curl -sL https://raw.githubusercontent.com/Optimizadorww/XiaomiTool-KP/main/XiaomiTool.sh | md5sum | awk '{print $1}')
         local_hash=$(md5sum "$0" | awk '{print $1}')
@@ -40,8 +41,8 @@ volver() {
     read
 }
 
-# Ejecutar chequeos
-check_deps
+# La herramienta se encarga de todo al iniciar
+instalar_dependencias
 actualizar
 
 while true; do
@@ -91,11 +92,7 @@ while true; do
            echo -e "${YELLOW} 3. EDL (Qualcomm)${NC}"
            echo -e "${RED} 0. Volver${NC}"
            read -p " >> Elija: " r
-           case $r in
-               1) adb reboot bootloader ;;
-               2) adb reboot recovery ;;
-               3) adb reboot edl ;;
-           esac ;;
+           if [ "$r" == "1" ]; then adb reboot bootloader; elif [ "$r" == "2" ]; then adb reboot recovery; elif [ "$r" == "3" ]; then adb reboot edl; fi ;;
         5) exit ;;
         *) sleep 1 ;;
     esac
