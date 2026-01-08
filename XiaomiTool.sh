@@ -8,10 +8,10 @@ RED='\033[0;31m'
 PURPLE='\033[0;35m'
 NC='\033[0m'
 
-# Función para instalar Fastboot y ADB automáticamente si no existen
+# Función para instalar herramientas automáticamente
 instalar_herramientas() {
-    if ! command -v fastboot &> /dev/null; then
-        echo -e "${YELLOW}[!] Fastboot no encontrado. Instalando Platform Tools...${NC}"
+    if ! command -v fastboot &> /dev/null || ! command -v adb &> /dev/null; then
+        echo -e "${YELLOW}[!] Herramientas no encontradas. Instalando Platform Tools...${NC}"
         pkg update && pkg upgrade -y
         pkg install android-tools curl -y
     fi
@@ -35,7 +35,7 @@ actualizar() {
 }
 
 volver() {
-    echo -e "\n${YELLOW}➡ Pulsa Enter para volver...${NC}"
+    echo -e "\n${YELLOW}➡ Pulsa Enter para volver al menú...${NC}"
     read
 }
 
@@ -64,6 +64,27 @@ while true; do
     read -p " >> Selecciona una opción: " opt
 
     case $opt in
+        1) clear
+           echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+           echo -e "${YELLOW}             DEBLOAT AUTOMÁTICO - XIAOMI             ${NC}"
+           echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+           echo -e "${YELLOW}[!] Verificando conexión ADB...${NC}"
+           adb_dev=$(adb devices | grep -v "List" | awk '{print $1}' | head -n 1)
+           if [[ -z "$adb_dev" ]]; then
+               echo -e "${RED}[✘] ERROR: No se detectó ningún dispositivo vía ADB.${NC}"
+               echo -e "${YELLOW}───────────────────────────────────────────────────────${NC}"
+               echo -e "1. Activa la Depuración USB en tu móvil."
+               echo -e "2. Conecta el cable y acepta el permiso en la pantalla."
+               echo -e "3. Asegúrate de que el móvil esté encendido normalmente."
+               echo -e "${YELLOW}───────────────────────────────────────────────────────${NC}"
+           else
+               echo -e "${GREEN}[✔] DISPOSITIVO DETECTADO:${NC} ${YELLOW}$adb_dev${NC}"
+               echo -e "${CYAN}[+] Eliminando aplicaciones basura...${NC}"
+               adb shell pm uninstall -k --user 0 com.miui.analytics
+               adb shell pm uninstall -k --user 0 com.miui.msa.global
+               echo -e "${GREEN}[✔] Debloat completado.${NC}"
+           fi
+           volver ;;
         3) clear
            echo -e "${PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
            echo -e "${CYAN}             MI UNLOCK PROTOCOL - XIAOMI             ${NC}"
