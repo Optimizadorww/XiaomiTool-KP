@@ -1,20 +1,30 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-echo -e "\e[32mIniciando instalación de XiaomiTool-KP...\e[0m"
+# Colores
+G='\033[0;32m'
+B='\033[0;34m'
+Y='\033[1;33m'
+C='\033[0;36m'
+NC='\033[0m'
 
-# Crear carpeta y entrar (CD)
-mkdir -p $HOME/XiaomiTool-KP
-cd $HOME/XiaomiTool-KP
+clear
+echo -e "${B}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${C}                XIAOMITOOL KP                        ${NC}"
+echo -e "${Y}             By: @AntiKripis                         ${NC}"
+echo -e "${B}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
-# Descargar el script usando CURL
-# REEMPLAZA "TU_USER" con tu usuario de GitHub
-curl -sL https://raw.githubusercontent.com/TU_USER/XiaomiTool-KP/main/XiaomiTool.sh -o XiaomiTool-KP
+echo -e "\n${G}[+]${NC} Configurando entorno..."
+mkdir -p $HOME/XiaomiTool
+cd $HOME/XiaomiTool
 
-# Dar todos los permisos
-chmod 777 XiaomiTool-KP
+echo -e "${G}[+]${NC} Descargando archivos..."
+curl -sL https://raw.githubusercontent.com/Optimizadorww/XiaomiTool-KP/main/XiaomiTool.sh -o XiaomiTool
 
-# Hacerlo comando global
-cp XiaomiTool-KP $PREFIX/bin/
-chmod +x $PREFIX/bin/XiaomiTool-KP
+echo -e "${G}[+]${NC} Aplicando permisos de sistema..."
+chmod 777 XiaomiTool
+cp XiaomiTool $PREFIX/bin/XiaomiTool
+chmod +x $PREFIX/bin/XiaomiTool
 
-echo -e "\e[32mInstalación terminada. Escribe 'XiaomiTool-KP' para iniciar.\e[0m"
+echo -e "\n${G}¡Instalación completa!${NC}"
+echo -e "Escribe ${Y}XiaomiTool${NC} para empezar."
+echo -e "${B}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
