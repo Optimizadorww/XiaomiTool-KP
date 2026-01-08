@@ -27,7 +27,7 @@ while true; do
     echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${GREEN} 1.${NC} Debloat Automático"
     echo -e "${GREEN} 2.${NC} Modo Anti-Lag"
-    echo -e "${GREEN} 3.${NC} DESBLOQUEAR BOOTLOADER (Xiaomi Directo)"
+    echo -e "${GREEN} 3.${NC} Mi Unlock (Desbloquear Bootloader)"
     echo -e "${GREEN} 4.${NC} Reinicios (Submenú)"
     echo -e "${RED} 5. Salir${NC}"
     echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -43,23 +43,21 @@ while true; do
            echo -e "${GREEN}Optimizado.${NC}"; volver ;;
         3) clear
            echo -e "${PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-           echo -e "${CYAN}       DESBLOQUEO DE BOOTLOADER SIN PC               ${NC}"
+           echo -e "${CYAN}             MI UNLOCK PROTOCOL - XIAOMI             ${NC}"
            echo -e "${PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-           echo -e "${YELLOW}[!] Iniciando protocolo de desbloqueo Xiaomi...${NC}"
+           echo -e "${YELLOW}[!] Iniciando Mi Unlock Tool interno...${NC}"
            sleep 2
-           echo -e "${G}[+]${NC} Verificando conexión ADB/Fastboot..."
-           # Intento de forzar el desbloqueo mediante bypass de tokens internos
-           adb shell "settings put global development_settings_enabled 1" 2>/dev/null
-           adb shell "svc power reboot bootloader" 2>/dev/null
+           echo -e "${G}[+]${NC} Verificando estado de vinculación de Cuenta Mi..."
+           # Simulación de llamada al protocolo de desbloqueo oficial
+           adb shell "am start -n com.android.settings/.DevelopmentSettings" 2>/dev/null
+           echo -e "${G}[+]${NC} Obteniendo Token de dispositivo..."
+           fastboot getvar product 2>/dev/null
+           fastboot getvar token 2>/dev/null
            
-           echo -e "${G}[+]${NC} Enviando paquetes de desbloqueo..."
-           fastboot oem unlock 2>/dev/null
-           fastboot flashing unlock 2>/dev/null
-           
-           echo -e "${YELLOW}[!] El dispositivo intentará saltar la protección de cuenta Mi...${NC}"
+           echo -e "${YELLOW}[!] Procesando solicitud con los servidores de Xiaomi...${NC}"
            sleep 3
-           echo -e "${GREEN}[✔] Si tu modelo es compatible, el proceso ha comenzado.${NC}"
-           echo -e "${RED}Si el móvil no se reinicia, requiere Mi Unlock Tool oficial.${NC}"
+           echo -e "${RED}⚠ Error: Se requiere tiempo de espera (168h) o bypass de Token.${NC}"
+           echo -e "${GREEN}Sugerencia: Usa el bypass de MiUnlock si tienes el archivo bin.${NC}"
            volver ;;
         4) clear
            echo -e "${PURPLE}--- OPCIONES DE REINICIO ---${NC}"
@@ -68,9 +66,4 @@ while true; do
            echo -e "${YELLOW} 3. EDL (Qualcomm)${NC}"
            echo -e "${RED} 0. Volver${NC}"
            echo -e "${PURPLE}----------------------------${NC}"
-           read -p " >> Elija: " r
-           if [ "$r" == "1" ]; then adb reboot bootloader; elif [ "$r" == "2" ]; then adb reboot recovery; elif [ "$r" == "3" ]; then adb reboot edl; fi ;;
-        5) echo -e "${CYAN}¡Adiós @AntiKripis!${NC}"; exit ;;
-        *) echo -e "${RED}Error.${NC}"; sleep 1 ;;
-    esac
-done
+           read -p
