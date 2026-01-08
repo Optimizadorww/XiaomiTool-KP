@@ -34,30 +34,24 @@ while true; do
     read -p " >> Selecciona una opción: " opt
 
     case $opt in
-        1) echo -e "${YELLOW}Limpiando sistema...${NC}"
-           adb shell pm uninstall -k --user 0 com.miui.analytics
-           adb shell pm uninstall -k --user 0 com.miui.msa.global
-           echo -e "${GREEN}Hecho.${NC}"; volver ;;
-        2) echo -e "${YELLOW}Optimizando RAM...${NC}"
-           adb shell settings put global adaptive_battery_management_enabled 1
-           echo -e "${GREEN}Optimizado.${NC}"; volver ;;
+        1) echo -e "${YELLOW}Limpiando sistema...${NC}"; adb shell pm uninstall -k --user 0 com.miui.analytics; adb shell pm uninstall -k --user 0 com.miui.msa.global; echo -e "${GREEN}Hecho.${NC}"; volver ;;
+        2) echo -e "${YELLOW}Optimizando RAM...${NC}"; adb shell settings put global adaptive_battery_management_enabled 1; echo -e "${GREEN}Optimizado.${NC}"; volver ;;
         3) clear
            echo -e "${PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
            echo -e "${CYAN}             MI UNLOCK PROTOCOL - XIAOMI             ${NC}"
            echo -e "${PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-           echo -e "${YELLOW}[!] Iniciando Mi Unlock Tool interno...${NC}"
-           sleep 2
-           echo -e "${G}[+]${NC} Verificando estado de vinculación de Cuenta Mi..."
-           # Simulación de llamada al protocolo de desbloqueo oficial
-           adb shell "am start -n com.android.settings/.DevelopmentSettings" 2>/dev/null
-           echo -e "${G}[+]${NC} Obteniendo Token de dispositivo..."
-           fastboot getvar product 2>/dev/null
-           fastboot getvar token 2>/dev/null
-           
-           echo -e "${YELLOW}[!] Procesando solicitud con los servidores de Xiaomi...${NC}"
-           sleep 3
-           echo -e "${RED}⚠ Error: Se requiere tiempo de espera (168h) o bypass de Token.${NC}"
-           echo -e "${GREEN}Sugerencia: Usa el bypass de MiUnlock si tienes el archivo bin.${NC}"
+           echo -e "${YELLOW}[!] Verificando conexión Fastboot...${NC}"
+           check_fb=$(fastboot devices | awk '{print $1}')
+           if [ -z "$check_fb" ]; then
+               echo -e "${RED}[✘] ERROR: Dispositivo no detectado.${NC}"
+               echo -e "${YELLOW}[i] Conecta el móvil en modo Fastboot.${NC}"
+           else
+               echo -e "${GREEN}[✔] Detectado: $check_fb${NC}"
+               echo -e "${CYAN}[+] Iniciando protocolo de desbloqueo...${NC}"
+               fastboot getvar product; fastboot getvar token
+               sleep 2
+               echo -e "${RED}⚠ Error: Requiere validación de servidor (168h).${NC}"
+           fi
            volver ;;
         4) clear
            echo -e "${PURPLE}--- OPCIONES DE REINICIO ---${NC}"
@@ -65,7 +59,6 @@ while true; do
            echo -e "${YELLOW} 2. Recovery${NC}"
            echo -e "${YELLOW} 3. EDL (Qualcomm)${NC}"
            echo -e "${RED} 0. Volver${NC}"
-           echo -e "${PURPLE}----------------------------${NC}"
            read -p " >> Elija: " r
            if [ "$r" == "1" ]; then adb reboot bootloader; elif [ "$r" == "2" ]; then adb reboot recovery; elif [ "$r" == "3" ]; then adb reboot edl; fi ;;
         5) echo -e "${CYAN}¡Adiós @AntiKripis!${NC}"; exit ;;
