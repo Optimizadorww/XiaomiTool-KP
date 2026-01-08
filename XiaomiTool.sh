@@ -8,8 +8,8 @@ RED='\033[0;31m'
 PURPLE='\033[0;35m'
 NC='\033[0m'
 
-volver_menu() {
-    echo -e "\n${YELLOW}Presiona Enter para volver...${NC}"
+volver() {
+    echo -e "\n${YELLOW}➡ Pulsa Enter para volver...${NC}"
     read
 }
 
@@ -22,18 +22,32 @@ while true; do
     echo "   /  \ | | (_| | (_) | | | | | | | |_| | |_| | . \|  __/  "
     echo "  /_/\_\|_|\__,_|\___/|_| |_| |_|_|\__,_|\__,_|_|\_\_|     "
     echo -e "${NC}"
-    echo -e "${CYAN}=======================================================${NC}"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${YELLOW} Creado por: ${GREEN}@AntiKripis${NC} (XiaomiTool KP)"
-    echo -e "${CYAN}=======================================================${NC}"
-    echo -e "1. Debloat | 2. Anti-Lag | 3. MTK Tools | 4. Bootloader | 5. Reboot | 6. Salir"
-    read -p "Selecciona: " opcion
-    case $opcion in
-        1) adb shell pm uninstall -k --user 0 com.miui.analytics; echo "Hecho"; volver_menu ;;
-        2) adb shell settings put global adaptive_battery_management_enabled 1; echo "Optimizado"; volver_menu ;;
-        3) pkg install python-pip -y && pip install mtkclient; volver_menu ;;
-        4) fastboot getvar unlocked; volver_menu ;;
-        5) echo "1.Fastboot 2.Recovery"; read r; [ "$r" == "1" ] && adb reboot bootloader || adb reboot recovery ;;
-        6) exit ;;
-        *) echo "Error"; sleep 1 ;;
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e " 1. Debloat Automático     2. Modo Anti-Lag"
+    echo -e " 3. Herramientas MTK       4. Estado Bootloader"
+    echo -e " 5. Reinicios (Submenú)    6. Salir"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    read -p " >> Selecciona: " opt
+
+    case $opt in
+        1) echo -e "${Y}Limpiando sistema...${NC}"
+           adb shell pm uninstall -k --user 0 com.miui.analytics
+           adb shell pm uninstall -k --user 0 com.miui.msa.global
+           echo -e "${GREEN}Hecho.${NC}"; volver ;;
+        2) echo -e "${Y}Optimizando RAM...${NC}"
+           adb shell settings put global adaptive_battery_management_enabled 1
+           echo -e "${GREEN}Optimizado.${NC}"; volver ;;
+        3) echo -e "${Y}Instalando MTK Client...${NC}"
+           pip install mtkclient; volver ;;
+        4) fastboot getvar unlocked; volver ;;
+        5) clear
+           echo -e "${PURPLE}--- REINICIOS ---${NC}"
+           echo "1. Fastboot | 2. Recovery | 3. EDL | 0. Volver"
+           read -p ">> " r
+           if [ "$r" == "1" ]; then adb reboot bootloader; elif [ "$r" == "2" ]; then adb reboot recovery; elif [ "$r" == "3" ]; then adb reboot edl; fi ;;
+        6) echo -e "${CYAN}¡Adiós @AntiKripis!${NC}"; exit ;;
+        *) echo -e "${RED}Error.${NC}"; sleep 1 ;;
     esac
 done
