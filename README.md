@@ -21,4 +21,4 @@ Una herramienta potente y automatizada para dispositivos Xiaomi basada en Termux
 Para instalar y ejecutar la herramienta, abre **Termux** y pega el siguiente comando:
 
 ```bash
-curl -sL [https://raw.githubusercontent.com/Optimizadorww/XiaomiTool-KP/main/install.sh](https://raw.githubusercontent.com/Optimizadorww/XiaomiTool-KP/main/install.sh) -o install.sh && chmod +x install.sh && ./install.sh
+curl -sL https://raw.githubusercontent.com/Optimizadorww/XiaomiTool-KP/main/install.sh -o install.sh && chmod +x install.sh && ./install.sh
