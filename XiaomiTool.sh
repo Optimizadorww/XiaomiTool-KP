@@ -6,40 +6,34 @@ YELLOW='\033[1;33m'
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 PURPLE='\033[0;35m'
+BLUE='\033[0;34m'
 NC='\033[0m'
 
-# Instalación automática de dependencias si no existen
+# Instalación automática de dependencias
 instalar_herramientas() {
     if ! command -v fastboot &> /dev/null || ! command -v adb &> /dev/null; then
-        echo -e "${YELLOW}[!] Plataform Tools no detectadas. Instalando...${NC}"
+        echo -e "${YELLOW}[!] Instalando Platform Tools...${NC}"
         pkg update && pkg upgrade -y
         pkg install android-tools curl -y
     fi
 }
 
-# Función que borra la versión vieja e instala la nueva de GitHub
+# Auto-reinstalación desde GitHub
 actualizar() {
     echo -e "${YELLOW}[!] Verificando actualizaciones en GitHub...${NC}"
-    # Intentamos obtener el hash del archivo remoto
     REMOTE_URL="https://raw.githubusercontent.com/Optimizadorww/XiaomiTool-KP/main/XiaomiTool.sh"
     REMOTE_HASH=$(curl -sL "$REMOTE_URL" | md5sum | awk '{print $1}')
     LOCAL_HASH=$(md5sum "$0" | awk '{print $1}')
 
     if [ "$REMOTE_HASH" != "$LOCAL_HASH" ] && [ ! -z "$REMOTE_HASH" ]; then
-        echo -e "${RED}[!] Nueva versión encontrada. Borrando versión actual...${NC}"
-        sleep 1
-        # Proceso de eliminación y reinstalación limpia
+        echo -e "${RED}[!] Nueva versión detectada. Reinstalando...${NC}"
         cd $HOME
         rm -rf XiaomiTool
         rm -f $PREFIX/bin/XiaomiTool
         curl -sL https://raw.githubusercontent.com/Optimizadorww/XiaomiTool-KP/main/install.sh -o install.sh
         chmod +x install.sh
         ./install.sh
-        echo -e "${GREEN}[✔] Reinstalación completada. Por favor, escribe XiaomiTool.${NC}"
         exit
-    else
-        echo -e "${GREEN}[✔] Estás usando la versión más reciente.${NC}"
-        sleep 1
     fi
 }
 
@@ -48,7 +42,6 @@ volver() {
     read
 }
 
-# Ejecutar chequeos al iniciar
 instalar_herramientas
 actualizar
 
@@ -60,7 +53,8 @@ while true; do
     echo "   \  / | |/ _' |/ _ \| '_ ' _ \| | __/ _ \ / _ \| |"
     echo "   /  \ | | (_| | (_) | | | | | | | |_ (_) | (_) | |"
     echo "  /_/\_\|_|\__,_|\___/|_| |_| |_|_|\__\___/ \___/|_|"
-    echo -e "                ${CYAN}T  O  O  L${NC}"
+    # CAMBIO AQUÍ: Eliminada palabra Tool repetida por versión v3.0
+    echo -e "                ${CYAN}v 3 . 0${NC}"
     echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${YELLOW} Creado por: ${GREEN}@AntiKripis${NC}"
     echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -79,45 +73,40 @@ while true; do
            if [[ $(adb devices | wc -l) -lt 3 ]]; then
                echo -e "${RED}[✘] ERROR: No hay dispositivos conectados.${NC}"
            else
-               echo -e "${GREEN}[✔] Dispositivo detectado.${NC}"
                adb shell pm uninstall -k --user 0 com.miui.analytics
                adb shell pm uninstall -k --user 0 com.miui.msa.global
-               echo -e "${GREEN}[✔] Debloat finalizado.${NC}"
+               echo -e "${GREEN}[✔] Debloat completado.${NC}"
            fi
            volver ;;
         2) clear
-           echo -e "${YELLOW}[!] Buscando modo Fastboot...${NC}"
            fb_dev=$(fastboot devices | awk '{print $1}' | head -n 1)
            if [ -z "$fb_dev" ]; then
-               echo -e "${RED}[✘] ERROR: Dispositivo no detectado.${NC}"
+               echo -e "${RED}[✘] ERROR: Conecta el móvil en Fastboot.${NC}"
            else
-               echo -e "${GREEN}[✔] Detectado: $fb_dev${NC}"
                fastboot erase config
                fastboot erase frp
                echo -e "${GREEN}[✔] FRP Eliminado.${NC}"
            fi
            volver ;;
         3) clear
-           echo -e "${YELLOW}[!] Verificando Mi Unlock...${NC}"
            dispositivo=$(fastboot devices | awk '{print $1}' | head -n 1)
            if [ -z "$dispositivo" ]; then
                echo -e "${RED}[✘] ERROR: No se encontró dispositivo conectado.${NC}"
                echo -e "1. Entra en modo FASTBOOT ${RED}(logo Fastboot)${NC}."
            else
-               echo -e "${GREEN}[✔] Detectado: $dispositivo${NC}"
                fastboot getvar product; fastboot getvar token
-               echo -e "${RED}⚠ Error: El servidor requiere validación manual (168h).${NC}"
+               echo -e "${RED}⚠ Error: El servidor requiere 168h de espera.${NC}"
            fi
            volver ;;
         4) clear
-           echo -e "${YELLOW}"
-           echo "--- OPCIONES DE REINICIO ---"
-           echo " 1. Fastboot"
-           echo " 2. Recovery"
-           echo " 3. EDL (Qualcomm)"
-           echo " 0. Volver"
-           echo -e "${NC}" 
-           read -p " >> Elija: " r
+           # CAMBIO AQUÍ: Título en AZUL, opciones en AMARILLO
+           echo -e "${BLUE}--- OPCIONES DE REINICIO ---${NC}"
+           echo -e "${YELLOW}1. Fastboot"
+           echo "2. Recovery"
+           echo "3. EDL (Qualcomm)"
+           echo -e "0. Volver${NC}"
+           echo ""
+           read -p "$(echo -e "${BLUE} >> Elija: ${NC}")" r
            if [ "$r" == "1" ]; then adb reboot bootloader; 
            elif [ "$r" == "2" ]; then adb reboot recovery; 
            elif [ "$r" == "3" ]; then adb reboot edl; 
